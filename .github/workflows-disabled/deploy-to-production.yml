@@ -16,7 +16,7 @@ jobs:
       with:
         python-version: '3.8'
     - run: python -m pip install --upgrade pip
-    - run: pip install aws-sam-cli
+    - run: pip install 'aws-sam-cli==1.11.0'
     - run: sam validate
     - run: sam build
     - run: "sam deploy \
