@@ -90,6 +90,9 @@ Resources:
                 - 
                   EventType: origin-request
                   LambdaFunctionARN: !Ref LambdaEdgeRewriteFunction.Version
+                - 
+                  EventType: origin-response
+                  LambdaFunctionARN: !Ref LambdaEdgeSecurityFunction.Version
               ForwardedValues:
                 QueryString: 'false'
                 Cookies:
@@ -146,8 +149,17 @@ Resources:
         Role: !GetAtt LambdaEdgeFunctionRole.Arn
         Runtime: nodejs12.x
         Handler: index.handler
-        Timeout: 5
+        Timeout: 10
         AutoPublishAlias: live 
+  LambdaEdgeSecurityFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        CodeUri: security/
+        Role: !GetAtt LambdaEdgeFunctionRole.Arn
+        Runtime: nodejs12.x
+        Handler: index.handler
+        Timeout: 5
+        AutoPublishAlias: live
 
   LambdaEdgeFunctionRole:
     Type: "AWS::IAM::Role"
@@ -201,6 +213,10 @@ Outputs:
   LambdaEdgeRewriteFunctionVersion: 
     Description: Lambda@Edge Rewrite Function ARN with Version
     Value: !Ref LambdaEdgeRewriteFunction.Version
+
+  LambdaEdgeSecurityFunctionVersion: 
+    Description: Lambda@Edge Rewrite Function ARN with Version
+    Value: !Ref LambdaEdgeSecurityFunction.Version
 
   CFDistribution: 
     Description: Cloudfront Distribution Domain Name

@@ -58,7 +58,7 @@ else
   cp -f "${event_file}"  "${temp_event_file}"
 fi
 
-sam local invoke --event "${temp_event_file}"
+sam local invoke "LambdaEdgeRewriteFunction" --event "${temp_event_file}"
 
 # Clean up
 rm -f "${temp_event_file}"
