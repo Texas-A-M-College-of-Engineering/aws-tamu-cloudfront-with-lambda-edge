@@ -18,7 +18,7 @@ fi
 
 
 event_file="${1}"
-temp_event_file="/tmp/$(echo "${event_file}" | rev | cut -d/ -f1 | rev)"
+temp_event_file="/tmp/cf.$(echo "${event_file}" | rev | cut -d/ -f1 | rev)"
 rewrite_file="${2}"
 
 if [ ! -f "${event_file}" ]
