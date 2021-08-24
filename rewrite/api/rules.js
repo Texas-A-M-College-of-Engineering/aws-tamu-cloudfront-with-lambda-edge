@@ -123,10 +123,28 @@ class RuleSet {
     });
   }
 
+  combineUriAndQs(uri, qs) {
+    return  qs !== '' ? uri + '?' + qs : uri;
+  }
+
+  separateUriAndQs(uriPlusQs) {
+    const parts = uriPlusQs.split('?');
+    return parts.length > 1 ? [parts[0], parts[1]] : [parts[0], ''];
+  }
+
   applyRules(e) {
-    const req = e.Records[0].cf.request;    
-    const uri = req.uri;
+    const req = e.Records[0].cf.request; 
+    const uri = this.combineUriAndQs(req.uri, req.querystring);
+    var first = true;
     return this.rewriteRules.reduce((acc, rule) => {
+
+      if (first) {
+        acc.res.uri = uri;
+        first = false;
+      }
+
+      //console.log('acc.res.uri:');
+      //console.log(acc.res.uri);
      
       if (acc.skip == true) {
         return acc;
@@ -142,7 +160,7 @@ class RuleSet {
         acc.res.headers.host[0].value = rule.hostRW;
       }
   
-      var match = rule.regexp.test(req.uri);
+      var match = rule.regexp.test(acc.res.uri);
       // If not match
       if (!match) {
         // Inverted rewrite
@@ -172,7 +190,7 @@ class RuleSet {
             headers: {
               location: [{
                 key: 'Location',
-                value: uri.replace(rule.regexp, rule.replace),
+                value: acc.res.uri.replace(rule.regexp, rule.replace),
               }],
             },
           }, 'skip': rule.last
@@ -182,7 +200,7 @@ class RuleSet {
       // Rewrite
       if (!rule.inverted) {
         if (rule.replace !== '-') {
-          acc.res.uri = uri.replace(rule.regexp, rule.replace);
+          acc.res.uri = acc.res.uri.replace(rule.regexp, rule.replace);
         }
         acc.skip = rule.last;
         return acc;
